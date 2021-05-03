@@ -1,6 +1,6 @@
 {
     "canvas": [6, 6],
-    "agent_position": [[1,1], [2,2]],
+    "agent_position": [[1,1], [2,2], [3,3]],
     "p": 4,
     "horizon" : 3
 }

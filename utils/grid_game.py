@@ -4,10 +4,11 @@ import copy
 import os
 import json
 import itertools
+import time
 
 class gridForeging:
     def __init__(self, agent_position, gridmap, horizon, iter_num=2, beta = .5, 
-            isparallel = True, optimal = False):
+            isparallel = True, optimal = False, trial=1):
         self.agent_list = []
         self.gridMap = gridmap
         M, N = gridmap.shape
@@ -27,6 +28,7 @@ class gridForeging:
         self.action_space = [(0, 1), (1, 0), (0, -1), (-1, 0), (0, 0)]
         self.action_space_team = [self.action_space] * self.teamnum
         self.all_possible_action_seq = list(itertools.product(*self.action_space_team))
+        self.trial = trial
         if optimal:
             self.optimal_simulate()
         else:
@@ -34,9 +36,11 @@ class gridForeging:
                 self.iBR_simulate()
             else:
                 self.iBR_simulate_seq()
+            
     
     def iBR_simulate(self):
         # iBR in parallel way
+        init_time = time.time()
         gridmap_copy = copy.deepcopy(self.gridMap)
         self.record['gridmap'] = gridmap_copy.tolist()
         cur_positions = self.getPositions()
@@ -89,14 +93,16 @@ class gridForeging:
             record_iter["gain"] = team_utility
             self.record[t] = record_iter
 
+        self.record["t"] = time.time() - init_time
         dataPath = os.path.join(os.getcwd(), 'data', 'result')
         filename = os.path.join(dataPath, "ibr_iter_parallel_" + str (self.iter_num) + "_horizon_" + \
-            str(self.horizon) + ".json")
+            str(self.horizon) + '_' + str(self.trial) + ".json")
         with open(filename, 'w') as outfiles:
             json.dump(self.record, outfiles, indent=4)
 
     def iBR_simulate_seq(self):
         # iBR in sequential way
+        init_time = time.time()
         gridmap_copy = copy.deepcopy(self.gridMap)
         self.record['gridmap'] = gridmap_copy.tolist()
         cur_positions = self.getPositions()
@@ -150,14 +156,16 @@ class gridForeging:
             record_iter["gain"] = team_utility
             self.record[t] = record_iter
 
+        self.record["t"] = time.time() - init_time
         dataPath = os.path.join(os.getcwd(), 'data', 'result')
         filename = os.path.join(dataPath, "ibr_iter_seq_" + str (self.iter_num) + "_horizon_" + \
-            str(self.horizon) + ".json")
+            str(self.horizon) + '_' + str(self.trial) + ".json")
         with open(filename, 'w') as outfiles:
             json.dump(self.record, outfiles, indent=4)
 
     def optimal_simulate(self):
-        """ Exhaustive method to search for best result, DFS approach with pruning """                
+        """ Exhaustive method to search for best result, DFS approach with pruning """ 
+        init_time = time.time()               
         gridmap_copy = copy.deepcopy(self.gridMap)
         self.record['gridmap'] = gridmap_copy.tolist()
         cur_positions = self.getPositions()
@@ -192,9 +200,10 @@ class gridForeging:
             self.sol = {"policy": [], "utility": []}
             
         # save the data
+        self.record["t"] = time.time() - init_time
         dataPath = os.path.join(os.getcwd(), 'data', 'result')
         filename = os.path.join(dataPath, "dfs_horizon_" + \
-            str(self.horizon) + ".json")
+            str(self.horizon) + '_' + str(self.trial) + ".json")
         with open(filename, 'w') as outfiles:
             json.dump(self.record, outfiles, indent=4)
 

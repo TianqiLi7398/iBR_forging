@@ -9,12 +9,12 @@ import matplotlib.animation as animation
 from matplotlib.patches import Circle, FancyArrowPatch
 from matplotlib.text import Text
 
-def start(iter_num, horizon, parallel):
+def start(iter_num, horizon, parallel, iter):
     
     dataPath = os.path.join(os.getcwd(), 'data', 'result')
     if parallel:
         filename = os.path.join(dataPath, "ibr_iter_parallel_" + str (iter_num) + "_horizon_" + \
-            str(horizon) + ".json")
+            str(horizon) + "_" + str(iter) + ".json")
     else:
         filename = os.path.join(dataPath, "ibr_iter_seq_" + str (iter_num) + "_horizon_" + \
             str(horizon) + ".json")
@@ -75,14 +75,14 @@ def start(iter_num, horizon, parallel):
         return trj1,
 
     
-    ani = animation.FuncAnimation(fig, animate, frames=time,
+    ani = animation.FuncAnimation(fig, animate, frames=time-1,
                                 interval=10, blit=True, init_func=init, repeat = False)
     path = os.getcwd()
 
     videopath = os.path.join(path, 'video')
     if parallel:
         filename = os.path.join(videopath, "ibr_iter_parallel_" + str (iter_num) + "_horizon_" + \
-            str(horizon) + '.mp4')
+            str(horizon) + "_" + str(iter) + '.mp4')
     else:
         filename = os.path.join(videopath, "ibr_iter_seq_" + str (iter_num) + "_horizon_" + \
             str(horizon) + '.mp4')
@@ -92,9 +92,10 @@ def start(iter_num, horizon, parallel):
 
 
 if __name__=="__main__":
-    iter_num, horizon = 2, 3
+    iter_num, horizon = 4, 2
     parallel = True
-    for horizon in range(3, 6):
-        for iter_ in range(2, 5):
-            for parallel in [True, False]:
-                start(iter_, horizon, parallel)
+    start(iter_num, horizon, parallel, 0)
+    # for horizon in range(3, 6):
+    #     for iter_ in range(2, 5):
+    #         for parallel in [True, False]:
+    #             start(iter_, horizon, parallel)
